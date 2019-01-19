@@ -132,10 +132,13 @@ var PanZoomTrailer = /** @class */ (function () {
         var updateZoom = function () {
             var totalBarHeightSvg = completedBarHeightSvg + currentlyAddingBarHeightSvg;
             var scaleLinear = Math.min(1, 1 / (totalBarHeightSvg / 400));
+            if (scaleLinear < 0) {
+                scaleLinear = 1;
+            }
             scale = customSigmoid(scaleLinear);
             _this.attr(_this.perspective, 'transform', 'scale(' + scale + ')');
-            _this.attr(_this.heightEndMarker, 'stroke-width', 1 / scale);
-            _this.attr(_this.heightLine, 'stroke-width', 1 / scale);
+            _this.attr(_this.heightEndMarker, 'stroke-width', 2 / scale);
+            _this.attr(_this.heightLine, 'stroke-width', 2 / scale);
         };
         var up = function (onEnd) {
             if (tasksDoneCount > 10) {
@@ -180,6 +183,16 @@ var PanZoomTrailer = /** @class */ (function () {
             todo.push(up);
             todo.push(down);
         }
+        todo.push(function () {
+            new PZTAnimation(function (progressPercent) {
+                _this.phone.style.opacity = (1 - progressPercent).toString();
+                _this.hand.style.opacity = (1 - progressPercent).toString();
+            }, function () {
+                _this.phone.style.opacity = '0';
+                _this.hand.style.opacity = '0';
+                _this.step4();
+            }).start(300);
+        });
         var workTodo = function () {
             tasksDoneCount++;
             if (todo[tasksDoneCount]) {
@@ -190,9 +203,12 @@ var PanZoomTrailer = /** @class */ (function () {
         // truck height in m: 4.2
         // truck height in svg that i want: 4620
         // scale: 23
+        updateBarHeight();
         setTimeout(function () { return workTodo(); }, 1000);
     };
     ;
+    PanZoomTrailer.prototype.step4 = function () {
+    };
     PanZoomTrailer.prototype.getInterpolateChoordFct = function (progressPercent, from, to) {
         return function (coord) { return from[coord] + (to[coord] - from[coord]) * progressPercent; };
     };

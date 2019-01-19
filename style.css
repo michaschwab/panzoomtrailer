@@ -33,3 +33,6 @@ body {
     text-align: justify;
     font-size: 6px;
 }
+#vis {
+    position: relative;
+}

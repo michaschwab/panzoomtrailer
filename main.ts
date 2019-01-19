@@ -116,7 +116,8 @@ class PanZoomTrailer {
             up(() => down(() => up(() => down(() => up(() => down(() => {
                 new PZTAnimation((progressPercent: number) => {
                     this.phoneText.style.opacity = (1 - progressPercent).toString();
-                }, () => this.step3()).start(300);
+                }, () => this.step3()
+                ).start(300);
             }))))));
         }, 500);
     }
@@ -163,12 +164,15 @@ class PanZoomTrailer {
 
         const updateZoom = () => {
             const totalBarHeightSvg = completedBarHeightSvg + currentlyAddingBarHeightSvg;
-            const scaleLinear = Math.min(1, 1 / (totalBarHeightSvg / 400));
+            let scaleLinear = Math.min(1, 1 / (totalBarHeightSvg / 400));
+            if(scaleLinear < 0) {
+                scaleLinear = 1;
+            }
             scale = customSigmoid(scaleLinear);
 
             this.attr(this.perspective, 'transform', 'scale(' + scale + ')');
-            this.attr(this.heightEndMarker, 'stroke-width', 1 / scale);
-            this.attr(this.heightLine, 'stroke-width', 1 / scale);
+            this.attr(this.heightEndMarker, 'stroke-width', 2 / scale);
+            this.attr(this.heightLine, 'stroke-width', 2 / scale);
         };
 
         const up = (onEnd: () => void) => {
@@ -214,6 +218,16 @@ class PanZoomTrailer {
             todo.push(up);
             todo.push(down);
         }
+        todo.push(() => {
+            new PZTAnimation((progressPercent: number) => {
+                this.phone.style.opacity = (1 - progressPercent).toString();
+                this.hand.style.opacity = (1 - progressPercent).toString();
+            }, () => {
+                this.phone.style.opacity = '0';
+                this.hand.style.opacity = '0';
+                this.step4();
+            }).start(300);
+        });
 
         const workTodo = () => {
             tasksDoneCount++;
@@ -226,8 +240,14 @@ class PanZoomTrailer {
         // truck height in svg that i want: 4620
         // scale: 23
 
+        updateBarHeight();
+
         setTimeout(() => workTodo(), 1000);
     };
+
+    step4() {
+
+    }
 
     private getInterpolateChoordFct(progressPercent: number, from: {x: number, y: number}, to: {x: number, y: number}) {
         return (coord: 'x'|'y') => from[coord] + (to[coord] - from[coord]) * progressPercent;
