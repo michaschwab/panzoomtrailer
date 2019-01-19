@@ -5,6 +5,7 @@ class PanZoomTrailer {
     private height = 0;
 
     private text: HTMLElement;
+    private phoneText: HTMLElement;
     private hand: SVGElement;
     private phone: SVGElement;
     private heightLine: SVGLineElement;
@@ -33,8 +34,9 @@ class PanZoomTrailer {
         const heightLine = document.getElementById('height-line');
         const heightEndMarker = document.getElementById('height-end-marker');
         const perspective = document.getElementById('perspective');
+        const phoneText = document.getElementById('phone-text');
 
-        if(!hand || !phone || !text || !heightLine || !heightEndMarker || !perspective) {
+        if(!hand || !phone || !text || !heightLine || !heightEndMarker || !perspective || !phoneText) {
             throw new Error('Could not find crucial DOM elements');
         }
         this.hand = <SVGElement> <unknown> hand;
@@ -43,6 +45,7 @@ class PanZoomTrailer {
         this.heightLine = <SVGLineElement> <unknown> heightLine;
         this.heightEndMarker = <SVGLineElement> <unknown> heightEndMarker;
         this.perspective = <SVGGElement> <unknown> perspective;
+        this.phoneText = phoneText;
 
         this.step1();
     }
@@ -61,6 +64,8 @@ class PanZoomTrailer {
 
         this.moveTo(this.phone, centerX - 100, this.height - this.initialBottomPadding - 170);
         this.moveTo(this.hand, handFrom.x, handFrom.y);
+        this.phoneText.style.left = centerX - 30 + 'px';
+        this.phoneText.style.top = this.height - this.initialBottomPadding - 28 + 'px';
 
         this.text.innerText = 'Pan and Zoom is important because we use it a lot.';
         setTimeout(() => {
@@ -79,11 +84,23 @@ class PanZoomTrailer {
         const handBottom = {x: centerX - 90, y: this.height - this.initialBottomPadding};
         const handTop = {x: centerX - 90, y: this.height - this.initialBottomPadding - 70};
 
+        let finishedScrollingPx = 0;
+        let currentlyScrollingPx = 0;
+
+        const updateScroll = () => {
+            this.phoneText.scrollTop = finishedScrollingPx + currentlyScrollingPx;
+        };
+
         const up = (onEnd: () => void) => {
             new PZTAnimation((progressPercent: number) => {
                 const interpolateFct = this.getInterpolateChoordFct(progressPercent, handBottom, handTop);
+                currentlyScrollingPx = (handBottom.y - handTop.y) * progressPercent;
+                updateScroll();
                 this.moveTo(this.hand, interpolateFct('x'), interpolateFct('y'))
             }, () => {
+                currentlyScrollingPx = 0;
+                finishedScrollingPx += handBottom.y - handTop.y;
+                updateScroll();
                 onEnd();
             }).start(500);
         };
@@ -97,7 +114,9 @@ class PanZoomTrailer {
         };
         setTimeout(() => {
             up(() => down(() => up(() => down(() => up(() => down(() => {
-                this.step3();
+                new PZTAnimation((progressPercent: number) => {
+                    this.phoneText.style.opacity = (1 - progressPercent).toString();
+                }, () => this.step3()).start(300);
             }))))));
         }, 500);
     }
@@ -153,18 +172,25 @@ class PanZoomTrailer {
         };
 
         const up = (onEnd: () => void) => {
-            const animationTime = Math.max(400 - 10 * tasksDoneCount, 20);
-            new PZTAnimation((progressPercent: number) => {
-                const interpolateFct = this.getInterpolateChoordFct(progressPercent, handBottom, handTop);
-                this.moveTo(this.hand, interpolateFct('x'), interpolateFct('y'));
-                currentlyAddingBarHeightSvg = progressPercent * lineHeightSvgAddedPerCycle;
+            if(tasksDoneCount > 10) {
+                completedBarHeightSvg += lineHeightSvgAddedPerCycle;
                 updateBarHeight();
                 updateZoom();
-            }, () => {
-                completedBarHeightSvg += lineHeightSvgAddedPerCycle;
-                currentlyAddingBarHeightSvg = 0;
-                onEnd();
-            }).start(animationTime);
+                setTimeout(onEnd);
+            } else {
+                const animationTime = Math.max(400 - 10 * tasksDoneCount, 20);
+                new PZTAnimation((progressPercent: number) => {
+                    const interpolateFct = this.getInterpolateChoordFct(progressPercent, handBottom, handTop);
+                    this.moveTo(this.hand, interpolateFct('x'), interpolateFct('y'));
+                    currentlyAddingBarHeightSvg = progressPercent * lineHeightSvgAddedPerCycle;
+                    updateBarHeight();
+                    updateZoom();
+                }, () => {
+                    completedBarHeightSvg += lineHeightSvgAddedPerCycle;
+                    currentlyAddingBarHeightSvg = 0;
+                    onEnd();
+                }).start(animationTime);
+            }
         };
         const down = (onEnd: () => void) => {
             if(tasksDoneCount > 10) {

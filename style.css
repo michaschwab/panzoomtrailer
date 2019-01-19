@@ -23,3 +23,13 @@ body {
     font-size: 24pt;
     color: #444;
 }
+#phone-text {
+    position: absolute;
+    left: 100px;
+    top: 100px;
+    width: 65px;
+    height: 105px;
+    overflow: hidden;
+    text-align: justify;
+    font-size: 6px;
+}

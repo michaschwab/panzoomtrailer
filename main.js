@@ -20,7 +20,8 @@ var PanZoomTrailer = /** @class */ (function () {
         var heightLine = document.getElementById('height-line');
         var heightEndMarker = document.getElementById('height-end-marker');
         var perspective = document.getElementById('perspective');
-        if (!hand || !phone || !text || !heightLine || !heightEndMarker || !perspective) {
+        var phoneText = document.getElementById('phone-text');
+        if (!hand || !phone || !text || !heightLine || !heightEndMarker || !perspective || !phoneText) {
             throw new Error('Could not find crucial DOM elements');
         }
         this.hand = hand;
@@ -29,6 +30,7 @@ var PanZoomTrailer = /** @class */ (function () {
         this.heightLine = heightLine;
         this.heightEndMarker = heightEndMarker;
         this.perspective = perspective;
+        this.phoneText = phoneText;
         this.step1();
     }
     PanZoomTrailer.prototype.setSize = function () {
@@ -44,6 +46,8 @@ var PanZoomTrailer = /** @class */ (function () {
         var handTo = { x: centerX - 90, y: this.height - this.initialBottomPadding };
         this.moveTo(this.phone, centerX - 100, this.height - this.initialBottomPadding - 170);
         this.moveTo(this.hand, handFrom.x, handFrom.y);
+        this.phoneText.style.left = centerX - 30 + 'px';
+        this.phoneText.style.top = this.height - this.initialBottomPadding - 28 + 'px';
         this.text.innerText = 'Pan and Zoom is important because we use it a lot.';
         setTimeout(function () {
             new PZTAnimation(function (progressPercent) {
@@ -60,11 +64,21 @@ var PanZoomTrailer = /** @class */ (function () {
         var centerX = this.width / 2;
         var handBottom = { x: centerX - 90, y: this.height - this.initialBottomPadding };
         var handTop = { x: centerX - 90, y: this.height - this.initialBottomPadding - 70 };
+        var finishedScrollingPx = 0;
+        var currentlyScrollingPx = 0;
+        var updateScroll = function () {
+            _this.phoneText.scrollTop = finishedScrollingPx + currentlyScrollingPx;
+        };
         var up = function (onEnd) {
             new PZTAnimation(function (progressPercent) {
                 var interpolateFct = _this.getInterpolateChoordFct(progressPercent, handBottom, handTop);
+                currentlyScrollingPx = (handBottom.y - handTop.y) * progressPercent;
+                updateScroll();
                 _this.moveTo(_this.hand, interpolateFct('x'), interpolateFct('y'));
             }, function () {
+                currentlyScrollingPx = 0;
+                finishedScrollingPx += handBottom.y - handTop.y;
+                updateScroll();
                 onEnd();
             }).start(500);
         };
@@ -78,7 +92,9 @@ var PanZoomTrailer = /** @class */ (function () {
         };
         setTimeout(function () {
             up(function () { return down(function () { return up(function () { return down(function () { return up(function () { return down(function () {
-                _this.step3();
+                new PZTAnimation(function (progressPercent) {
+                    _this.phoneText.style.opacity = (1 - progressPercent).toString();
+                }, function () { return _this.step3(); }).start(300);
             }); }); }); }); }); });
         }, 500);
     };
@@ -122,18 +138,26 @@ var PanZoomTrailer = /** @class */ (function () {
             _this.attr(_this.heightLine, 'stroke-width', 1 / scale);
         };
         var up = function (onEnd) {
-            var animationTime = Math.max(400 - 10 * tasksDoneCount, 20);
-            new PZTAnimation(function (progressPercent) {
-                var interpolateFct = _this.getInterpolateChoordFct(progressPercent, handBottom, handTop);
-                _this.moveTo(_this.hand, interpolateFct('x'), interpolateFct('y'));
-                currentlyAddingBarHeightSvg = progressPercent * lineHeightSvgAddedPerCycle;
+            if (tasksDoneCount > 10) {
+                completedBarHeightSvg += lineHeightSvgAddedPerCycle;
                 updateBarHeight();
                 updateZoom();
-            }, function () {
-                completedBarHeightSvg += lineHeightSvgAddedPerCycle;
-                currentlyAddingBarHeightSvg = 0;
-                onEnd();
-            }).start(animationTime);
+                setTimeout(onEnd);
+            }
+            else {
+                var animationTime = Math.max(400 - 10 * tasksDoneCount, 20);
+                new PZTAnimation(function (progressPercent) {
+                    var interpolateFct = _this.getInterpolateChoordFct(progressPercent, handBottom, handTop);
+                    _this.moveTo(_this.hand, interpolateFct('x'), interpolateFct('y'));
+                    currentlyAddingBarHeightSvg = progressPercent * lineHeightSvgAddedPerCycle;
+                    updateBarHeight();
+                    updateZoom();
+                }, function () {
+                    completedBarHeightSvg += lineHeightSvgAddedPerCycle;
+                    currentlyAddingBarHeightSvg = 0;
+                    onEnd();
+                }).start(animationTime);
+            }
         };
         var down = function (onEnd) {
             if (tasksDoneCount > 10) {
