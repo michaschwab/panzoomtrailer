@@ -13,7 +13,7 @@ class PanZoomTrailer {
 
     private phoneHeightSvg = 165;
     private phoneHeightM = 0.15;
-    private svgUnitToM = this.phoneHeightM / this.phoneHeightSvg;
+    private svgUnitToM = this.phoneHeightM / this.phoneHeightSvg; // 0.0009090909
     private initialBottomPadding = 330;
 
     constructor() {
@@ -178,6 +178,11 @@ class PanZoomTrailer {
                 todo[i](workTodo);
             }
         };
+        // truck height in svg: 200px
+        // truck height in m: 4.2
+        // truck height in svg that i want: 4620
+        // scale: 23
+
         setTimeout(() => workTodo(), 1000);
     };
 

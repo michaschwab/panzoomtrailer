@@ -5,7 +5,7 @@ var PanZoomTrailer = /** @class */ (function () {
         this.height = 0;
         this.phoneHeightSvg = 165;
         this.phoneHeightM = 0.15;
-        this.svgUnitToM = this.phoneHeightM / this.phoneHeightSvg;
+        this.svgUnitToM = this.phoneHeightM / this.phoneHeightSvg; // 0.0009090909
         this.initialBottomPadding = 330;
         var vis = document.getElementById('vis');
         if (!vis) {
@@ -146,6 +146,10 @@ var PanZoomTrailer = /** @class */ (function () {
                 todo[i](workTodo);
             }
         };
+        // truck height in svg: 200px
+        // truck height in m: 4.2
+        // truck height in svg that i want: 4620
+        // scale: 23
         setTimeout(function () { return workTodo(); }, 1000);
     };
     ;
