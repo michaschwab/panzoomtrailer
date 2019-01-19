@@ -8,6 +8,7 @@ body {
     margin: 0;
     background: linear-gradient(#fff, #fff, #ddd);
     /*background: #000;*/
+    overflow: hidden;
 }
 
 #hand path {
