@@ -103,7 +103,7 @@ class PanZoomTrailer {
     }
 
     private step3() {
-        this.text.innerText = 'In fact, this is how much you daily: ';
+        this.text.innerText = 'In fact, this is how much you pan daily: ';
 
         const centerX = this.width / 2;
         const handBottom = {x: centerX - 90, y: this.height - this.initialBottomPadding};
@@ -121,7 +121,7 @@ class PanZoomTrailer {
             const totalBarHeightSvg = completedBarHeightSvg + currentlyAddingBarHeightSvg;
             const totalbarHeightM = Math.round(totalBarHeightSvg * this.svgUnitToM);
 
-            this.text.innerText = 'In fact, this is how much you daily: ' + totalbarHeightM + 'm';
+            this.text.innerText = 'In fact, this is how much you pan daily: ' + totalbarHeightM + 'm';
 
             this.attr(this.heightEndMarker, 'x1', lineX - 5 / scale);
             this.attr(this.heightEndMarker, 'x2', lineX + 5 / scale);

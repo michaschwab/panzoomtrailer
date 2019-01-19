@@ -84,7 +84,7 @@ var PanZoomTrailer = /** @class */ (function () {
     };
     PanZoomTrailer.prototype.step3 = function () {
         var _this = this;
-        this.text.innerText = 'In fact, this is how much you daily: ';
+        this.text.innerText = 'In fact, this is how much you pan daily: ';
         var centerX = this.width / 2;
         var handBottom = { x: centerX - 90, y: this.height - this.initialBottomPadding };
         var handTop = { x: centerX - 90, y: this.height - this.initialBottomPadding - 70 };
@@ -98,7 +98,7 @@ var PanZoomTrailer = /** @class */ (function () {
         var updateBarHeight = function () {
             var totalBarHeightSvg = completedBarHeightSvg + currentlyAddingBarHeightSvg;
             var totalbarHeightM = Math.round(totalBarHeightSvg * _this.svgUnitToM);
-            _this.text.innerText = 'In fact, this is how much you daily: ' + totalbarHeightM + 'm';
+            _this.text.innerText = 'In fact, this is how much you pan daily: ' + totalbarHeightM + 'm';
             _this.attr(_this.heightEndMarker, 'x1', lineX - 5 / scale);
             _this.attr(_this.heightEndMarker, 'x2', lineX + 5 / scale);
             _this.attr(_this.heightEndMarker, 'y1', lineStartY - totalBarHeightSvg);
