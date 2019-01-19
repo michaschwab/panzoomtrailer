@@ -139,7 +139,7 @@ class PanZoomTrailer {
         this.attr(this.perspective, 'transform-origin', lineX + 'px ' + (lineStartY + 200) + 'px');
 
         const customSigmoid = (t:number) => {
-            return 1/(1+Math.pow(Math.E, -10*(t-0.5)));
+            return 1/(1+Math.pow(Math.E, -10*(t-0.43)));
         };
 
         const updateZoom = () => {
