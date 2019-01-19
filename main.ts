@@ -117,6 +117,8 @@ class PanZoomTrailer {
         let currentlyAddingBarHeightSvg = 0;
         let scale = 1;
 
+        let tasksDoneCount = -1;
+
         const updateBarHeight = () => {
             const totalBarHeightSvg = completedBarHeightSvg + currentlyAddingBarHeightSvg;
             const totalbarHeightM = Math.round(totalBarHeightSvg * this.svgUnitToM);
@@ -136,9 +138,14 @@ class PanZoomTrailer {
 
         this.attr(this.perspective, 'transform-origin', lineX + 'px ' + (lineStartY + 200) + 'px');
 
+        const customSigmoid = (t:number) => {
+            return 1/(1+Math.pow(Math.E, -10*(t-0.5)));
+        };
+
         const updateZoom = () => {
             const totalBarHeightSvg = completedBarHeightSvg + currentlyAddingBarHeightSvg;
-            scale = Math.min(1, 1 / (totalBarHeightSvg / 300));
+            const scaleLinear = Math.min(1, 1 / (totalBarHeightSvg / 400));
+            scale = customSigmoid(scaleLinear);
 
             this.attr(this.perspective, 'transform', 'scale(' + scale + ')');
             this.attr(this.heightEndMarker, 'stroke-width', 1 / scale);
@@ -146,6 +153,7 @@ class PanZoomTrailer {
         };
 
         const up = (onEnd: () => void) => {
+            const animationTime = Math.max(400 - 10 * tasksDoneCount, 20);
             new PZTAnimation((progressPercent: number) => {
                 const interpolateFct = this.getInterpolateChoordFct(progressPercent, handBottom, handTop);
                 this.moveTo(this.hand, interpolateFct('x'), interpolateFct('y'));
@@ -156,11 +164,21 @@ class PanZoomTrailer {
                 completedBarHeightSvg += lineHeightSvgAddedPerCycle;
                 currentlyAddingBarHeightSvg = 0;
                 onEnd();
-            }).start(30);
+            }).start(animationTime);
         };
         const down = (onEnd: () => void) => {
-            this.moveTo(this.hand, handBottom.x, handBottom.y);
-            setTimeout(onEnd);
+            if(tasksDoneCount > 10) {
+                this.moveTo(this.hand, handBottom.x, handBottom.y);
+                setTimeout(onEnd);
+            } else {
+                const animationTime = Math.max(100 - 10 * tasksDoneCount, 30);
+                new PZTAnimation((progressPercent: number) => {
+                    const interpolateFct = this.getInterpolateChoordFct(progressPercent, handTop, handBottom);
+                    this.moveTo(this.hand, interpolateFct('x'), interpolateFct('y'));
+                }, () => {
+                    onEnd();
+                }).start(animationTime);
+            }
         };
 
         const todo: ((cb: () => void) => void)[] = [];
@@ -171,11 +189,10 @@ class PanZoomTrailer {
             todo.push(down);
         }
 
-        let i = -1;
         const workTodo = () => {
-            i++;
-            if(todo[i]) {
-                todo[i](workTodo);
+            tasksDoneCount++;
+            if(todo[tasksDoneCount]) {
+                todo[tasksDoneCount](workTodo);
             }
         };
         // truck height in svg: 200px

@@ -95,6 +95,7 @@ var PanZoomTrailer = /** @class */ (function () {
         var completedBarHeightSvg = 0;
         var currentlyAddingBarHeightSvg = 0;
         var scale = 1;
+        var tasksDoneCount = -1;
         var updateBarHeight = function () {
             var totalBarHeightSvg = completedBarHeightSvg + currentlyAddingBarHeightSvg;
             var totalbarHeightM = Math.round(totalBarHeightSvg * _this.svgUnitToM);
@@ -109,14 +110,19 @@ var PanZoomTrailer = /** @class */ (function () {
             _this.attr(_this.heightLine, 'y2', lineStartY - totalBarHeightSvg);
         };
         this.attr(this.perspective, 'transform-origin', lineX + 'px ' + (lineStartY + 200) + 'px');
+        var customSigmoid = function (t) {
+            return 1 / (1 + Math.pow(Math.E, -10 * (t - 0.5)));
+        };
         var updateZoom = function () {
             var totalBarHeightSvg = completedBarHeightSvg + currentlyAddingBarHeightSvg;
-            scale = Math.min(1, 1 / (totalBarHeightSvg / 300));
+            var scaleLinear = Math.min(1, 1 / (totalBarHeightSvg / 400));
+            scale = customSigmoid(scaleLinear);
             _this.attr(_this.perspective, 'transform', 'scale(' + scale + ')');
             _this.attr(_this.heightEndMarker, 'stroke-width', 1 / scale);
             _this.attr(_this.heightLine, 'stroke-width', 1 / scale);
         };
         var up = function (onEnd) {
+            var animationTime = Math.max(400 - 10 * tasksDoneCount, 20);
             new PZTAnimation(function (progressPercent) {
                 var interpolateFct = _this.getInterpolateChoordFct(progressPercent, handBottom, handTop);
                 _this.moveTo(_this.hand, interpolateFct('x'), interpolateFct('y'));
@@ -127,23 +133,33 @@ var PanZoomTrailer = /** @class */ (function () {
                 completedBarHeightSvg += lineHeightSvgAddedPerCycle;
                 currentlyAddingBarHeightSvg = 0;
                 onEnd();
-            }).start(30);
+            }).start(animationTime);
         };
         var down = function (onEnd) {
-            _this.moveTo(_this.hand, handBottom.x, handBottom.y);
-            setTimeout(onEnd);
+            if (tasksDoneCount > 10) {
+                _this.moveTo(_this.hand, handBottom.x, handBottom.y);
+                setTimeout(onEnd);
+            }
+            else {
+                var animationTime = Math.max(100 - 10 * tasksDoneCount, 30);
+                new PZTAnimation(function (progressPercent) {
+                    var interpolateFct = _this.getInterpolateChoordFct(progressPercent, handTop, handBottom);
+                    _this.moveTo(_this.hand, interpolateFct('x'), interpolateFct('y'));
+                }, function () {
+                    onEnd();
+                }).start(animationTime);
+            }
         };
         var todo = [];
         var countCyclesNeeded = Math.round(goalHeightM / lineHeightSvgAddedPerCycle / this.svgUnitToM);
-        for (var i_1 = 0; i_1 < countCyclesNeeded; i_1++) {
+        for (var i = 0; i < countCyclesNeeded; i++) {
             todo.push(up);
             todo.push(down);
         }
-        var i = -1;
         var workTodo = function () {
-            i++;
-            if (todo[i]) {
-                todo[i](workTodo);
+            tasksDoneCount++;
+            if (todo[tasksDoneCount]) {
+                todo[tasksDoneCount](workTodo);
             }
         };
         // truck height in svg: 200px
