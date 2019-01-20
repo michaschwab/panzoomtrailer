@@ -116,7 +116,10 @@ class PanZoomTrailer {
             up(() => down(() => up(() => down(() => up(() => down(() => {
                 new PZTAnimation((progressPercent: number) => {
                     this.phoneText.style.opacity = (1 - progressPercent).toString();
-                }, () => this.step3()
+                }, () => {
+                    this.phoneText.style.opacity = '0';
+                    this.step3();
+                }
                 ).start(300);
             }))))));
         }, 500);
@@ -312,6 +315,22 @@ class PanZoomTrailer {
         this.text.innerText = 'What if we could save even just 5% of that time?';
         new PZTAnimation((percentDone: number) => {
             this.vis.style.opacity = (1 - percentDone).toString();
+        }, () => {
+            this.vis.style.opacity = '0';
+            setTimeout(() => this.step6(), 3000);
+        }).start(500);
+    }
+
+    step6() {
+        this.text.innerText = 'Evaluating Pan and Zoom Timelines and Sliders';
+
+        const paperInfoElements = document.getElementsByClassName('paper-info');
+
+        new PZTAnimation((percentDone: number) => {
+            for(let i = 0; i < paperInfoElements.length; i++) {
+                const paperInfoElement = paperInfoElements[i];
+                (paperInfoElement as HTMLElement).style.opacity = percentDone.toString();
+            }
         }).start(500);
     }
 

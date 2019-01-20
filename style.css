@@ -15,13 +15,7 @@ body {
     fill: #d07e2a;
 }
 #text {
-    position: absolute;
     top: 150px;
-    width: 100%;
-    text-align: center;
-    font-family: Ubuntu, sans-serif;
-    font-size: 24pt;
-    color: #444;
 }
 #phone-text {
     position: absolute;
@@ -38,4 +32,29 @@ body {
 }
 #everest path {
     fill: #999;
+}
+.floating-texts {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    font-family: Ubuntu, sans-serif;
+    font-size: 24pt;
+    color: #444;
+}
+.paper-info {
+    opacity: 0;
+}
+#venue {
+    top: 110px;
+    font-size: 18pt;
+}
+#authors {
+    top: 200px;
+    font-size: 18pt;
+}
+#paper-preview {
+    top: 300px;
+}
+#institutions {
+    top: 450px;
 }

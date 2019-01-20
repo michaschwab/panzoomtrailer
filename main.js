@@ -94,7 +94,10 @@ var PanZoomTrailer = /** @class */ (function () {
             up(function () { return down(function () { return up(function () { return down(function () { return up(function () { return down(function () {
                 new PZTAnimation(function (progressPercent) {
                     _this.phoneText.style.opacity = (1 - progressPercent).toString();
-                }, function () { return _this.step3(); }).start(300);
+                }, function () {
+                    _this.phoneText.style.opacity = '0';
+                    _this.step3();
+                }).start(300);
             }); }); }); }); }); });
         }, 500);
     };
@@ -262,6 +265,19 @@ var PanZoomTrailer = /** @class */ (function () {
         this.text.innerText = 'What if we could save even just 5% of that time?';
         new PZTAnimation(function (percentDone) {
             _this.vis.style.opacity = (1 - percentDone).toString();
+        }, function () {
+            _this.vis.style.opacity = '0';
+            setTimeout(function () { return _this.step6(); }, 3000);
+        }).start(500);
+    };
+    PanZoomTrailer.prototype.step6 = function () {
+        this.text.innerText = 'Evaluating Pan and Zoom Timelines and Sliders';
+        var paperInfoElements = document.getElementsByClassName('paper-info');
+        new PZTAnimation(function (percentDone) {
+            for (var i = 0; i < paperInfoElements.length; i++) {
+                var paperInfoElement = paperInfoElements[i];
+                paperInfoElement.style.opacity = percentDone.toString();
+            }
         }).start(500);
     };
     PanZoomTrailer.prototype.getInterpolateChoordFct = function (progressPercent, from, to) {
