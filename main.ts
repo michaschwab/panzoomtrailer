@@ -225,7 +225,7 @@ class PanZoomTrailer {
             }, () => {
                 this.phone.style.opacity = '0';
                 this.hand.style.opacity = '0';
-                this.step4();
+                this.step4(scale);
             }).start(300);
         });
 
@@ -235,18 +235,67 @@ class PanZoomTrailer {
                 todo[tasksDoneCount](workTodo);
             }
         };
-        // truck height in svg: 200px
-        // truck height in m: 4.2
-        // truck height in svg that i want: 4620
-        // scale: 23
 
         updateBarHeight();
 
         setTimeout(() => workTodo(), 1000);
     };
 
-    step4() {
+    step4(scaleStart: number) {
 
+        const centerX = this.width / 2;
+        const lineX = centerX - 16;
+        const lineStartY = this.height - this.initialBottomPadding + 60;
+
+        this.text.innerText = 'Over a year, you zoom: ';
+
+        const barStartHeight = 25 / this.svgUnitToM;
+        const barEndHeight = 25 * 365 / this.svgUnitToM;
+
+        let barHeight = barStartHeight;
+        let scale = scaleStart;
+
+        const customSigmoid = (t:number) => {
+            return 1/(1+Math.pow(Math.E, -15*(t-0.4)));
+        };
+
+        const updateZoom = () => {
+            let scaleLinear = Math.min(1, 1 / ((barHeight - barStartHeight) / 25000));
+            if(scaleLinear < 0) {
+                scaleLinear = 1;
+            }
+            //console.log(scaleLinear);
+            scale = scaleStart * customSigmoid(scaleLinear);
+
+            this.attr(this.perspective, 'transform', 'scale(' + scale + ')');
+            this.attr(this.heightEndMarker, 'stroke-width', 2 / scale);
+            this.attr(this.heightLine, 'stroke-width', 2 / scale);
+        };
+        updateZoom();
+
+        const updateBarHeight = () => {
+            const totalbarHeightM = Math.round(barHeight * this.svgUnitToM);
+
+            this.text.innerText = 'Over a year, you zoom: ' + totalbarHeightM + 'm';
+
+            this.attr(this.heightEndMarker, 'x1', lineX - 5 / scale);
+            this.attr(this.heightEndMarker, 'x2', lineX + 5 / scale);
+            this.attr(this.heightEndMarker, 'y1', lineStartY - barHeight);
+            this.attr(this.heightEndMarker, 'y2', lineStartY - barHeight);
+
+            this.attr(this.heightLine, 'x1', lineX);
+            this.attr(this.heightLine, 'x2', lineX);
+            this.attr(this.heightLine, 'y1', lineStartY);
+            this.attr(this.heightLine, 'y2', lineStartY - barHeight);
+        };
+
+        setTimeout(() => {
+            new PZTAnimation((percentDone: number) => {
+                barHeight = barStartHeight + (barEndHeight - barStartHeight) * percentDone;
+                updateBarHeight();
+                updateZoom();
+            }).start(5000);
+        }, 2000);
     }
 
     private getInterpolateChoordFct(progressPercent: number, from: {x: number, y: number}, to: {x: number, y: number}) {

@@ -190,7 +190,7 @@ var PanZoomTrailer = /** @class */ (function () {
             }, function () {
                 _this.phone.style.opacity = '0';
                 _this.hand.style.opacity = '0';
-                _this.step4();
+                _this.step4(scale);
             }).start(300);
         });
         var workTodo = function () {
@@ -199,15 +199,54 @@ var PanZoomTrailer = /** @class */ (function () {
                 todo[tasksDoneCount](workTodo);
             }
         };
-        // truck height in svg: 200px
-        // truck height in m: 4.2
-        // truck height in svg that i want: 4620
-        // scale: 23
         updateBarHeight();
         setTimeout(function () { return workTodo(); }, 1000);
     };
     ;
-    PanZoomTrailer.prototype.step4 = function () {
+    PanZoomTrailer.prototype.step4 = function (scaleStart) {
+        var _this = this;
+        var centerX = this.width / 2;
+        var lineX = centerX - 16;
+        var lineStartY = this.height - this.initialBottomPadding + 60;
+        this.text.innerText = 'Over a year, you zoom: ';
+        var barStartHeight = 25 / this.svgUnitToM;
+        var barEndHeight = 25 * 365 / this.svgUnitToM;
+        var barHeight = barStartHeight;
+        var scale = scaleStart;
+        var customSigmoid = function (t) {
+            return 1 / (1 + Math.pow(Math.E, -15 * (t - 0.4)));
+        };
+        var updateZoom = function () {
+            var scaleLinear = Math.min(1, 1 / ((barHeight - barStartHeight) / 25000));
+            if (scaleLinear < 0) {
+                scaleLinear = 1;
+            }
+            //console.log(scaleLinear);
+            scale = scaleStart * customSigmoid(scaleLinear);
+            _this.attr(_this.perspective, 'transform', 'scale(' + scale + ')');
+            _this.attr(_this.heightEndMarker, 'stroke-width', 2 / scale);
+            _this.attr(_this.heightLine, 'stroke-width', 2 / scale);
+        };
+        updateZoom();
+        var updateBarHeight = function () {
+            var totalbarHeightM = Math.round(barHeight * _this.svgUnitToM);
+            _this.text.innerText = 'Over a year, you zoom: ' + totalbarHeightM + 'm';
+            _this.attr(_this.heightEndMarker, 'x1', lineX - 5 / scale);
+            _this.attr(_this.heightEndMarker, 'x2', lineX + 5 / scale);
+            _this.attr(_this.heightEndMarker, 'y1', lineStartY - barHeight);
+            _this.attr(_this.heightEndMarker, 'y2', lineStartY - barHeight);
+            _this.attr(_this.heightLine, 'x1', lineX);
+            _this.attr(_this.heightLine, 'x2', lineX);
+            _this.attr(_this.heightLine, 'y1', lineStartY);
+            _this.attr(_this.heightLine, 'y2', lineStartY - barHeight);
+        };
+        setTimeout(function () {
+            new PZTAnimation(function (percentDone) {
+                barHeight = barStartHeight + (barEndHeight - barStartHeight) * percentDone;
+                updateBarHeight();
+                updateZoom();
+            }).start(5000);
+        }, 2000);
     };
     PanZoomTrailer.prototype.getInterpolateChoordFct = function (progressPercent, from, to) {
         return function (coord) { return from[coord] + (to[coord] - from[coord]) * progressPercent; };
