@@ -299,8 +299,20 @@ class PanZoomTrailer {
                 barHeight = barStartHeight + (barEndHeight - barStartHeight) * percentDone;
                 updateBarHeight();
                 updateZoom();
+            }, () => {
+                /*new PZTAnimation((percentDone: number) => {
+
+                }).start(500);*/
+                setTimeout(() => this.step5(), 1000);
             }).start(5000);
         }, 2000);
+    }
+
+    step5() {
+        this.text.innerText = 'What if we could save even just 5% of that time?';
+        new PZTAnimation((percentDone: number) => {
+            this.vis.style.opacity = (1 - percentDone).toString();
+        }).start(500);
     }
 
     private getInterpolateChoordFct(progressPercent: number, from: {x: number, y: number}, to: {x: number, y: number}) {

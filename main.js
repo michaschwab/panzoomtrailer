@@ -249,8 +249,20 @@ var PanZoomTrailer = /** @class */ (function () {
                 barHeight = barStartHeight + (barEndHeight - barStartHeight) * percentDone;
                 updateBarHeight();
                 updateZoom();
+            }, function () {
+                /*new PZTAnimation((percentDone: number) => {
+
+                }).start(500);*/
+                setTimeout(function () { return _this.step5(); }, 1000);
             }).start(5000);
         }, 2000);
+    };
+    PanZoomTrailer.prototype.step5 = function () {
+        var _this = this;
+        this.text.innerText = 'What if we could save even just 5% of that time?';
+        new PZTAnimation(function (percentDone) {
+            _this.vis.style.opacity = (1 - percentDone).toString();
+        }).start(500);
     };
     PanZoomTrailer.prototype.getInterpolateChoordFct = function (progressPercent, from, to) {
         return function (coord) { return from[coord] + (to[coord] - from[coord]) * progressPercent; };
