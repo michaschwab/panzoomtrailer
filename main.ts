@@ -225,7 +225,7 @@ class PanZoomTrailer {
             }, () => {
                 this.phone.style.opacity = '0';
                 this.hand.style.opacity = '0';
-                this.step4(scale);
+                setTimeout(() => this.step4(scale), 1000);
             }).start(300);
         });
 
@@ -247,13 +247,18 @@ class PanZoomTrailer {
         const lineX = centerX - 16;
         const lineStartY = this.height - this.initialBottomPadding + 60;
 
-        this.text.innerText = 'Over a year, you zoom: ';
+        this.text.innerText = 'Over a year, you pan: ';
 
         const barStartHeight = 25 / this.svgUnitToM;
         const barEndHeight = 25 * 365 / this.svgUnitToM;
 
         let barHeight = barStartHeight;
         let scale = scaleStart;
+
+        // everest size in svg: 570
+        // everest size in m: 8848
+        // svg unit to m: 0.0009090909
+        // scale: 17075
 
         const customSigmoid = (t:number) => {
             return 1/(1+Math.pow(Math.E, -15*(t-0.4)));
@@ -276,7 +281,7 @@ class PanZoomTrailer {
         const updateBarHeight = () => {
             const totalbarHeightM = Math.round(barHeight * this.svgUnitToM);
 
-            this.text.innerText = 'Over a year, you zoom: ' + totalbarHeightM + 'm';
+            this.text.innerText = 'Over a year, you pan: ' + totalbarHeightM + 'm';
 
             this.attr(this.heightEndMarker, 'x1', lineX - 5 / scale);
             this.attr(this.heightEndMarker, 'x2', lineX + 5 / scale);

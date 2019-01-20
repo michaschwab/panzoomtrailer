@@ -190,7 +190,7 @@ var PanZoomTrailer = /** @class */ (function () {
             }, function () {
                 _this.phone.style.opacity = '0';
                 _this.hand.style.opacity = '0';
-                _this.step4(scale);
+                setTimeout(function () { return _this.step4(scale); }, 1000);
             }).start(300);
         });
         var workTodo = function () {
@@ -208,11 +208,15 @@ var PanZoomTrailer = /** @class */ (function () {
         var centerX = this.width / 2;
         var lineX = centerX - 16;
         var lineStartY = this.height - this.initialBottomPadding + 60;
-        this.text.innerText = 'Over a year, you zoom: ';
+        this.text.innerText = 'Over a year, you pan: ';
         var barStartHeight = 25 / this.svgUnitToM;
         var barEndHeight = 25 * 365 / this.svgUnitToM;
         var barHeight = barStartHeight;
         var scale = scaleStart;
+        // everest size in svg: 570
+        // everest size in m: 8848
+        // svg unit to m: 0.0009090909
+        // scale: 17075
         var customSigmoid = function (t) {
             return 1 / (1 + Math.pow(Math.E, -15 * (t - 0.4)));
         };
@@ -230,7 +234,7 @@ var PanZoomTrailer = /** @class */ (function () {
         updateZoom();
         var updateBarHeight = function () {
             var totalbarHeightM = Math.round(barHeight * _this.svgUnitToM);
-            _this.text.innerText = 'Over a year, you zoom: ' + totalbarHeightM + 'm';
+            _this.text.innerText = 'Over a year, you pan: ' + totalbarHeightM + 'm';
             _this.attr(_this.heightEndMarker, 'x1', lineX - 5 / scale);
             _this.attr(_this.heightEndMarker, 'x2', lineX + 5 / scale);
             _this.attr(_this.heightEndMarker, 'y1', lineStartY - barHeight);

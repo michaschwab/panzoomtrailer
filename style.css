@@ -36,3 +36,6 @@ body {
 #vis {
     position: relative;
 }
+#everest path {
+    fill: #999;
+}
