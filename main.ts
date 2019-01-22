@@ -58,6 +58,8 @@ class PanZoomTrailer {
     }
 
     private step1() {
+        document.body.className = 'step1';
+
         const centerX = this.width / 2;
         const handFrom = {x: centerX + 100, y: this.height};
         const handTo = {x: centerX - 90, y: this.height - this.initialBottomPadding};
@@ -80,6 +82,8 @@ class PanZoomTrailer {
     }
 
     private step2() {
+        document.body.className = 'step2';
+
         const centerX = this.width / 2;
         const handBottom = {x: centerX - 90, y: this.height - this.initialBottomPadding};
         const handTop = {x: centerX - 90, y: this.height - this.initialBottomPadding - 70};
@@ -126,6 +130,7 @@ class PanZoomTrailer {
     }
 
     private step3() {
+        document.body.className = 'step3';
         this.text.innerText = 'In fact, this is how much you pan daily: ';
 
         const centerX = this.width / 2;
@@ -245,7 +250,7 @@ class PanZoomTrailer {
     };
 
     step4(scaleStart: number) {
-
+        document.body.className = 'step4';
         const centerX = this.width / 2;
         const lineX = centerX - 16;
         const lineStartY = this.height - this.initialBottomPadding + 60;
@@ -312,6 +317,7 @@ class PanZoomTrailer {
     }
 
     step5() {
+        document.body.className = 'step5';
         this.text.innerText = 'What if we could save even just 5% of that time?';
         new PZTAnimation((percentDone: number) => {
             this.vis.style.opacity = (1 - percentDone).toString();
@@ -322,6 +328,7 @@ class PanZoomTrailer {
     }
 
     step6() {
+        document.body.className = 'step6';
         this.text.innerText = 'Evaluating Pan and Zoom Timelines and Sliders';
 
         const paperInfoElements = document.getElementsByClassName('paper-info');

@@ -41,6 +41,7 @@ var PanZoomTrailer = /** @class */ (function () {
     };
     PanZoomTrailer.prototype.step1 = function () {
         var _this = this;
+        document.body.className = 'step1';
         var centerX = this.width / 2;
         var handFrom = { x: centerX + 100, y: this.height };
         var handTo = { x: centerX - 90, y: this.height - this.initialBottomPadding };
@@ -61,6 +62,7 @@ var PanZoomTrailer = /** @class */ (function () {
     };
     PanZoomTrailer.prototype.step2 = function () {
         var _this = this;
+        document.body.className = 'step2';
         var centerX = this.width / 2;
         var handBottom = { x: centerX - 90, y: this.height - this.initialBottomPadding };
         var handTop = { x: centerX - 90, y: this.height - this.initialBottomPadding - 70 };
@@ -103,6 +105,7 @@ var PanZoomTrailer = /** @class */ (function () {
     };
     PanZoomTrailer.prototype.step3 = function () {
         var _this = this;
+        document.body.className = 'step3';
         this.text.innerText = 'In fact, this is how much you pan daily: ';
         var centerX = this.width / 2;
         var handBottom = { x: centerX - 90, y: this.height - this.initialBottomPadding };
@@ -208,6 +211,7 @@ var PanZoomTrailer = /** @class */ (function () {
     ;
     PanZoomTrailer.prototype.step4 = function (scaleStart) {
         var _this = this;
+        document.body.className = 'step4';
         var centerX = this.width / 2;
         var lineX = centerX - 16;
         var lineStartY = this.height - this.initialBottomPadding + 60;
@@ -262,6 +266,7 @@ var PanZoomTrailer = /** @class */ (function () {
     };
     PanZoomTrailer.prototype.step5 = function () {
         var _this = this;
+        document.body.className = 'step5';
         this.text.innerText = 'What if we could save even just 5% of that time?';
         new PZTAnimation(function (percentDone) {
             _this.vis.style.opacity = (1 - percentDone).toString();
@@ -271,6 +276,7 @@ var PanZoomTrailer = /** @class */ (function () {
         }).start(500);
     };
     PanZoomTrailer.prototype.step6 = function () {
+        document.body.className = 'step6';
         this.text.innerText = 'Evaluating Pan and Zoom Timelines and Sliders';
         var paperInfoElements = document.getElementsByClassName('paper-info');
         new PZTAnimation(function (percentDone) {

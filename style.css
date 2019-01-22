@@ -17,6 +17,16 @@ body {
 #text {
     top: 150px;
 }
+.step5 #text {
+    background: linear-gradient(to right, #9b9b9b 0%,#9b9b9b 50%,#ffffff 50%,#ffffff 100%);
+    font-size: 36pt;
+    padding-right: 50%;
+    padding-left: 25%;
+    top: 0;
+    padding-top: 150px;
+    height: 100%;
+    color: #fff;
+}
 #phone-text {
     position: absolute;
     left: 100px;
